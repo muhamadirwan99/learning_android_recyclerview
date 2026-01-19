@@ -6,11 +6,13 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.dicoding.myrecyclerview.databinding.ItemRowHeroBinding
 
 class ListHeroAdapter(private val listHero: ArrayList<Hero>) : RecyclerView.Adapter<ListHeroAdapter.ListViewHolder>() {
-    private lateinit var onItemClickCallback : OnItemClickCallback
+    private lateinit var onItemClickCallback: OnItemClickCallback
 
-    fun setOnItemClickCallback(onItemClickCallback : OnItemClickCallback) {
+    fun setOnItemClickCallback(onItemClickCallback: OnItemClickCallback) {
         this.onItemClickCallback = onItemClickCallback
     }
 
@@ -18,23 +20,25 @@ class ListHeroAdapter(private val listHero: ArrayList<Hero>) : RecyclerView.Adap
         parent: ViewGroup,
         viewType: Int
     ): ListViewHolder {
-        val view : View = LayoutInflater.from(parent.context).inflate(R.layout.item_row_hero, parent, false)
-        return ListViewHolder(view)
+        val binding = ItemRowHeroBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ListViewHolder(binding)
     }
 
     override fun onBindViewHolder(
         holder: ListViewHolder,
         position: Int
     ) {
-       val (name, description, photo) = listHero[position]
-        holder.imgPhoto.setImageResource(photo)
-        holder.tvName.text = name
-        holder.tvDescription.text = description
-        holder.itemView.setOnClickListener{
+        val (name, description, photo) = listHero[position]
+        Glide.with(holder.itemView.context)
+            .load(photo)
+            .into(holder.binding.imgItemPhoto)
+        holder.binding.tvItemName.text = name
+        holder.binding.tvItemDescription.text = description
+        holder.itemView.setOnClickListener {
             val currentPosition = holder.bindingAdapterPosition
 
-            if (currentPosition != RecyclerView.NO_POSITION){
-                holder.itemView.setOnClickListener{
+            if (currentPosition != RecyclerView.NO_POSITION) {
+                holder.itemView.setOnClickListener {
                     onItemClickCallback.onItemClicked(listHero[currentPosition])
                 }
             }
@@ -43,11 +47,7 @@ class ListHeroAdapter(private val listHero: ArrayList<Hero>) : RecyclerView.Adap
 
     override fun getItemCount(): Int = listHero.size
 
-    class ListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val imgPhoto : ImageView = itemView.findViewById<ImageView>(R.id.img_item_photo)
-        val tvName : TextView = itemView.findViewById<TextView>(R.id.tv_item_name)
-        val tvDescription : TextView = itemView.findViewById<TextView>(R.id.tv_item_description)
-    }
+    class ListViewHolder(var binding : ItemRowHeroBinding) : RecyclerView.ViewHolder(binding.root)
 
 
     interface OnItemClickCallback {
